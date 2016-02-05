@@ -3,7 +3,7 @@
 hostname="pxeServer"
 
 hostsln1="127.0.0.1		localhost"
-hostsln2="127.0.1.1		pxeServer.phil.dev"
+hostsln2="127.0.1.1		pxeServer      pxeServer.phil.dev"
 
 tinycoreUrl="http://tinycorelinux.net/6.x/x86/archive/6.4/TinyCore-6.4.iso"
 
@@ -11,6 +11,8 @@ init() {
 	echo $hostname > /etc/hostname
 	echo $hostsln1 > /etc/hosts
 	echo $hostsln2 >> /etc/hosts
+
+    hostname $hostname
 
 	apt-get update -y
 
@@ -29,13 +31,16 @@ init() {
 
 configDhcp() {
 
-	echo 'filename "pxelinux.0"' > /etc/dhcp/dhcpd.conf
+	echo 'subnet 192.168.0.0 netmask 255.255.0.0 {
+        range 192.168.0.1 192.168.5.254;
+        filename "pxelinux.0";
+        }' >> /etc/dhcp/dhcpd.conf
 }
 
 configSyslinux() {
 	mkdir /tftpboot
 
-	cp /usr/share/syslinux/pxelinux.0 /tftpboot/pxelinux.0
+	cp /usr/lib/syslinux/pxelinux.0 /tftpboot/pxelinux.0
 
     mkdir /tftpboot/pxelinux.cfg/
     mkdir /tftpboot/tinycore/
@@ -50,7 +55,6 @@ configSyslinux() {
     	kernel /tftpboot/tinycore/vmlinux
     	append cde initrd=/tftpboot/tinycore/core.gz nfsmount=192.168.0.1:/tftpboot/tinycore/nfs/ tce=nfs/tce" > /tftpboot/pxelinux.cfg/default
 
-    #/////////////////   download and extract tinycore
     mkdir /temp/
     cd /temp/
     wget $tinycoreUrl
@@ -60,7 +64,7 @@ configSyslinux() {
     cd /mnt/tinycore/boot/
 
     cp core.gz /tftpboot/tinycore/
-    cp vmlinux /tftpboot/tinycore/
+    cp vmlinuz /tftpboot/tinycore/
 
 }
 
