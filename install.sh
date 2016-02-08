@@ -37,8 +37,27 @@ configDhcp() {
         }' >> /etc/dhcp/dhcpd.conf
 }
 
+configTftp() {
+
+echo 'service tftp {
+    protocol        = udp
+    port            = 69
+    socket_type     = dgram
+    wait            = yes
+    user            = nobody
+    server          = /usr/sbin/in.tftpd
+    server_args     = /tftpboot
+    disable         = no
+}' > /etc/xinetd.d/tftp
+
+    mkdir /tftpboot
+
+    sudo chmod -R 777 /tftpboot
+    sudo chown -R nobody /tftpboot
+
+}
+
 configSyslinux() {
-	mkdir /tftpboot
 
 	cp /usr/lib/syslinux/pxelinux.0 /tftpboot/pxelinux.0
 
@@ -49,11 +68,10 @@ configSyslinux() {
     touch default
 
     echo "
-	default tinycore
-    
+default tinycore
     label tinycore
     	kernel /tftpboot/tinycore/vmlinux
-    	append cde initrd=/tftpboot/tinycore/core.gz nfsmount=192.168.0.1:/tftpboot/tinycore/nfs/ tce=nfs/tce" > /tftpboot/pxelinux.cfg/default
+    	append cde initrd=/tftpboot/tinycore/core.gz nfsmount=192.168.0.1:/tftpboot/tinycore/nfs/ tftplist=192.168.0.1:/nfs/nfs.list tce=nfs/tce" > /tftpboot/pxelinux.cfg/default
 
     mkdir /temp/
     cd /temp/
@@ -76,12 +94,21 @@ configTinyCore() {
 	mkdir /tftpboot/tinycore/nfs/tce/
     mkdir /tftpboot/tinycore/nfs/tce/optional
 
+    cd /tftpboot/tinycore/nfs/
+
+    wget http://tinycorelinux.net/6.x/x86/tcz/rpcbind.tcz
+    wget http://tinycorelinux.net/6.x/x86/tcz/libtirpc.tcz
+    wget http://tinycorelinux.net/6.x/x86/tcz/nfs-utils.tcz
+    wget http://tinycorelinux.net/6.x/x86/tcz/nano.tcz
+    
+    wget http://tinycorelinux.net/4.x/x86/tcz/pv.tcz
 
 }
 
-init
-configDhcp
-configSyslinux
-configNFS
-configTinyCore
+#init
+#configDhcp
+configTftp
+#configSyslinux
+#configNFS
+#configTinyCore
 
