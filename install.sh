@@ -18,13 +18,13 @@ init() {
 
 	apt-get install -y isc-dhcp-server tftpd-hpa syslinux nfs-kernel-server
 
-	echo "
-	auto lo eth0
-	iface lo inet loopback
-	iface eth0 inet static
-        address 192.168.0.1
-        netmask 255.255.0.0
-    iface eth0 inet dhcp" > /etc/network/interfaces
+	echo "auto lo eth1
+iface lo inet loopback
+iface eth0 inet static
+    address 192.168.0.1
+    netmask 255.255.0.0
+
+iface eth1 inet dhcp" > /etc/network/interfaces
 
 
 }
