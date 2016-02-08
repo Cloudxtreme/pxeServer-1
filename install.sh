@@ -16,7 +16,7 @@ init() {
 
 	apt-get update -y
 
-	apt-get install -y isc-dhcp-server xinetd tftpd tftp syslinux nfs-kernel-server
+	apt-get install -y isc-dhcp-server tftpd-hpa syslinux nfs-kernel-server
 
 	echo "
 	auto lo eth0
@@ -39,21 +39,17 @@ configDhcp() {
 
 configTftp() {
 
-echo 'service tftp {
-    protocol        = udp
-    port            = 69
-    socket_type     = dgram
-    wait            = yes
-    user            = nobody
-    server          = /usr/sbin/in.tftpd
-    server_args     = /tftpboot
-    disable         = no
-}' > /etc/xinetd.d/tftp
+echo 'TFTP_USERNAME="tftp"
+TFTP_DIRECTORY="/tftpboot"
+TFTP_ADDRESS="0.0.0.0:69"
+TFTP_OPTIONS="--secure --create"' > /etc/default/tftpd-hpa
 
     mkdir /tftpboot
 
     sudo chmod -R 777 /tftpboot
     sudo chown -R nobody /tftpboot
+
+    sudo service xinetd restart
 
 }
 
@@ -70,8 +66,8 @@ configSyslinux() {
     echo "
 default tinycore
     label tinycore
-    	kernel /tftpboot/tinycore/vmlinux
-    	append cde initrd=/tftpboot/tinycore/core.gz nfsmount=192.168.0.1:/tftpboot/tinycore/nfs/ tftplist=192.168.0.1:/nfs/nfs.list tce=nfs/tce" > /tftpboot/pxelinux.cfg/default
+    	kernel /tinycore/vmlinuz
+    	append cde initrd=tinycore/core.gz nfsmount=192.168.0.1:/tftpboot/tinycore/nfs/ tftplist=192.168.0.1:/nfs/nfs.list tce=nfs/tce" > /tftpboot/pxelinux.cfg/default
 
     mkdir /temp/
     cd /temp/
@@ -105,10 +101,10 @@ configTinyCore() {
 
 }
 
-#init
-#configDhcp
+init
+configDhcp
 configTftp
-#configSyslinux
-#configNFS
-#configTinyCore
+configSyslinux
+configNFS
+configTinyCore
 
