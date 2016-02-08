@@ -69,8 +69,8 @@ configSyslinux() {
     echo "
 default tinycore
     label tinycore
-    	kernel /tinycore/vmlinuz
-    	append cde initrd=tinycore/core.gz nfsmount=192.168.0.1:/tftpboot/tinycore/nfs/ tftplist=192.168.0.1:/nfs/nfs.list tce=nfs/tce" > /tftpboot/pxelinux.cfg/default
+    	kernel tinycore/vmlinuz
+    	append initrd=tinycore/core.gz nfsmount=192.168.0.1:/tftpboot/tinycore/nfs/ tftplist=192.168.0.1:/nfs/tce/onboot.lst tce=nfs/tce" > /tftpboot/pxelinux.cfg/default
 
     mkdir /temp/
     cd /temp/
@@ -92,10 +92,26 @@ configNFS() {
 }
 
 configTinyCore() {
+
+    mkdir /temp/
+    cd /temp/
+    wget $tinycoreUrl
+    mkdir /mnt/tinycore
+    mount -o loop TinyCore-6.4.iso /mnt/tinycore
+
+    cd /mnt/tinycore/boot/
+
+    cp core.gz /tftpboot/tinycore/
+    cp vmlinuz /tftpboot/tinycore/
+
 	mkdir /tftpboot/tinycore/nfs/tce/
     mkdir /tftpboot/tinycore/nfs/tce/optional
 
-    cd /tftpboot/tinycore/nfs/
+    cd /mnt/tinycore/cde/
+
+    cp -R * /tftpboot/tinycore/nfs/tce/
+
+    cd /tftpboot/tinycore/nfs/tce/optional
 
     wget http://tinycorelinux.net/6.x/x86/tcz/rpcbind.tcz
     wget http://tinycorelinux.net/6.x/x86/tcz/libtirpc.tcz
@@ -103,6 +119,15 @@ configTinyCore() {
     wget http://tinycorelinux.net/6.x/x86/tcz/nano.tcz
     
     wget http://tinycorelinux.net/4.x/x86/tcz/pv.tcz
+
+    cd /tftpboot/tinycore/nfs/tce/
+
+    echo 'rpcbind.tcz' >> onboot.lst
+    echo 'libtirpc.tcz' >> onboot.lst
+    echo 'nfs-utils.tcz' >> onboot.lst
+    echo 'nano.tcz' >> onboot.lst
+
+    echo 'pv.tcz' >> onboot.lst
 
 }
 
