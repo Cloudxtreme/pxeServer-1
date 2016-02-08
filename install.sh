@@ -119,6 +119,9 @@ configTinyCore() {
     wget http://tinycorelinux.net/6.x/x86/tcz/nano.tcz
     
     wget http://tinycorelinux.net/4.x/x86/tcz/pv.tcz
+    wget http://distro.ibiblio.org/tinycorelinux/2.x/tcz/sfdisk.tcz
+    wget http://distro.ibiblio.org/tinycorelinux/3.x/tcz/grep.tcz
+    wget http://distro.ibiblio.org/tinycorelinux/4.x/x86/tcz/sed.tcz
 
     cd /tftpboot/tinycore/nfs/tce/
 
@@ -128,6 +131,9 @@ configTinyCore() {
     echo 'nano.tcz' >> onboot.lst
 
     echo 'pv.tcz' >> onboot.lst
+    echo 'sfdisk.tcz' >> onboot.lst
+    echo 'grep.tcz' >> onboot.lst
+    echo 'sed.tcz' >> onboot.lst
 
 }
 

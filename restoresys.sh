@@ -229,98 +229,73 @@ netRestore() {
 	done
 }
 
+#########################################################
+
+partTable() {
+	# export the partition table to file 
+	echo "exporting $drive Partition table...."
+	sfdisk -d $drive > partitiontable
+	}
+
+#########################################################
+
+zeroParts() {
+	echo "Zeroing free space on partitions..."
+
+#fdisk -l /dev/sdc | grep -o '/dev/sdc*[1-9]'
+# Get the list of partitions to be zeroed and add them to an array
+# $parts is the array of the partition names (eg. /dev/sda1, etc..)
+# maximum partitions 9 change 9 to allow for more
+	parts=($(fdisk -l $drive | grep -o "$drive*[1-9]"))
+	echo Partitions found: ${parts[*]}
 	
-#### Change the Hostname ################################
+# For each partition in the list
+	for p in "${parts[@]}"
+	do
+		echo $p
+		
+	# make a temp directory
+		mkdir /mnt/temp
+
+	# mount the current partition
+
+		mount -t ntfs-3g $p /mnt/temp || mount $p /mnt/temp
+
+	# Zero the empty space
+		echo "Creating Zeros"
+		dd if=/dev/zero | pv | dd of=/mnt/temp/delete bs=1M
+
+	# Delete the file to restore the free space
+		rm /mnt/temp/delete
+
+	# Unmount the current partition
+		umount $p
+		
+	#delete the temp directory
+		rmdir /mnt/temp
+
+	done
+	}
+
+#########################################################
+
+imgParts() {
+	parts=($(fdisk -l $drive | grep -o "$drive*[1-9]"))
+	echo Partitions found: ${parts[*]}
 	
-changeHostname() {
-    echo "Changing Windows Name";
-    echo "";
-    echo "Mounting sda1";
-    echo "";
+# For each partition in the list
+	for p in "${parts[@]}"
+	do
 
-    mountans=`mount | grep /dev/sda1`
-    if [ "$mountans" == "" ]; then
-        location="/mnt/tmpSda1"
-        mkdir $location
-        ntfs-3g /dev/sda1 $location
-        echo "Windows partition is mounted"
-    else
-        rocheck=`echo $mountans | grep rw`
-        if [ "$rocheck" == "" ]; then
-            echo 'ERROR : The Windows partition is read-only. Please unmount it'
-            echo 'Abort'
-            exit 1
-        fi
-        location=`echo $mountans | awk '{print $3}'`
-        echo "The partition is already mounted on $location"
-    fi
+	# gets the name of the drive in the format 'sda1' so it can be saved as a file
+		pName=`echo $p | sed -e 's/\/dev\///g'`
+		
+	# using dd and gzip we take an image of the partition and compress it
+		echo "Creating compressed image of $p..." 
+		dd if=$p conv=sync,noerror bs=4k | pv | gzip -c > $pName.img.gz
+		
+	done
+	}	
 
-    mountans=`mount | grep /dev/sda7`
-    if [ "$mountans" == "" ]; then
-        location2="/mnt/tmpSda7"
-        mkdir $location2
-        mount /dev/sda7 $location2
-        echo "Linux partition is mounted"
-    else
-        rocheck=`echo $mountans | grep rw`
-        if [ "$rocheck" == "" ]; then
-            echo 'ERROR : The Linux partition is read-only. Please unmount it'
-            echo 'Abort'
-            exit 1
-        fi
-        location2=`echo $mountans | awk '{print $3}'`
-        echo "The partition is already mounted on $location2"
-    fi
-
-    echo "Retrieving Network Configuration to associate Name";
-
-    ifconfig eth0 > ipaddress
-    var=$(grep 'inet addr:' ipaddress | cut -c 31-33)
-    ip=$(grep 'inet addr:' ipaddress | cut -c 21-33)
-    mac=$(grep 'HWaddr' ipaddress | cut -c 39-55)
-
-    echo "Changing Name";
-
-    systemFile=$location/Windows/System32/config/SYSTEM
-    echo -e "cd ControlSet001\\services\\Tcpip\\Parameters\ned Hostname\nM$var\nq\ny\n" | chntpw $systemFile > /dev/null
-    echo -e "cd ControlSet001\\services\\Tcpip\\Parameters\ned NV Hostname\nM$var\nq\ny\n" | chntpw $systemFile > /dev/null
-    echo -e "cd ControlSet001\\Control\\ComputerName\\ActiveComputerName\ned ComputerName\nM$var\nq\ny\n" | chntpw $systemFile > /dev/null
-    echo -e "cd ControlSet001\\Control\\ComputerName\\ComputerName\ned ComputerName\nM$var\nq\ny\n" | chntpw $systemFile > /dev/null
-    echo -e "cd ControlSet002\\services\\Tcpip\\Parameters\ned Hostname\nM$var\nq\ny\n" | chntpw $systemFile > /dev/null
-    echo -e "cd ControlSet002\\services\\Tcpip\\Parameters\ned NV Hostname\nM$var\nq\ny\n" | chntpw $systemFile > /dev/null
-    echo -e "cd ControlSet002\\Control\\ComputerName\\ActiveComputerName\ned ComputerName\nM$var\nq\ny\n" | chntpw $systemFile > /dev/null
-    echo -e "cd ControlSet002\\Control\\ComputerName\\ComputerName\ned ComputerName\nM$var\nq\ny\n" | chntpw $systemFile > /dev/null
-    echo "Computer name changed to M$var"
-
-    echo "127.0.0.1 localhost" > $location2/etc/hosts
-    echo "127.0.0.1 M$var" >> $location2/etc/hosts
-    echo 'M'$var > $location2/etc/hostname
-    rm ipaddress
-
-    echo "Unmounting partition";
-
-    if [ "$mountans" == "" ]; then
-        umount /mnt/tmpSda1
-        umount /mnt/tmpSda7
-        rmdir $location
-        rmdir $location2
-        echo "Partitions unmounted"
-    fi
-
-    echo "Dhcp configuration Mac/Ip"
-    mkdir /mountSSHFS
-
-    mkdir /root/.ssh
-
-    ssh-keyscan 192.168.0.1 > /root/.ssh/known_hosts
-    echo Tigrou007 | sshfs chimay@192.168.0.1:/ /mountSSHFS -o password_stdin
-
-
-
-    echo -e "\nhost M$var { \n\t hardware ethernet $mac; \n\t fixed-address $ip; \n} \n" >> /mountSSHFS/etc/dhcp/dhcpd.conf
-    echo "Dhcp Configuration Finished"
-    umount /mountSSHFS
-    rmdir /mountSSHFS
-}
 
 main
