@@ -122,6 +122,9 @@ configTinyCore() {
     wget http://distro.ibiblio.org/tinycorelinux/2.x/tcz/sfdisk.tcz
     wget http://distro.ibiblio.org/tinycorelinux/3.x/tcz/grep.tcz
     wget http://distro.ibiblio.org/tinycorelinux/4.x/x86/tcz/sed.tcz
+    wget http://distro.ibiblio.org/tinycorelinux/4.x/x86/tcz/bash.tcz
+    wget http://distro.ibiblio.org/tinycorelinux/4.x/x86/tcz/ncurses.tcz
+    wget http://distro.ibiblio.org/tinycorelinux/4.x/x86/tcz/ncursesw.tcz
 
     cd /tftpboot/tinycore/nfs/tce/
 
@@ -134,6 +137,10 @@ configTinyCore() {
     echo 'sfdisk.tcz' >> onboot.lst
     echo 'grep.tcz' >> onboot.lst
     echo 'sed.tcz' >> onboot.lst
+    echo 'bash.tcz' >> onboot.lst
+    echo 'ncurses.tcz' >> onboot.lst
+    echo 'ncursesw.tcz' >> onboot.lst
+
 
 }
 
