@@ -18,8 +18,9 @@ init() {
 
 	apt-get install -y isc-dhcp-server tftpd-hpa syslinux nfs-kernel-server
 
-	echo "auto lo eth1
+	echo "auto lo eth0 eth1
 iface lo inet loopback
+
 iface eth0 inet static
     address 192.168.0.1
     netmask 255.255.0.0
@@ -35,6 +36,8 @@ configDhcp() {
         range 192.168.0.1 192.168.5.254;
         filename "pxelinux.0";
         }' >> /etc/dhcp/dhcpd.conf
+
+    service isc-dhcp-server restart
 }
 
 configTftp() {
@@ -49,7 +52,7 @@ TFTP_OPTIONS="--secure --create"' > /etc/default/tftpd-hpa
     sudo chmod -R 777 /tftpboot
     sudo chown -R nobody /tftpboot
 
-    sudo service xinetd restart
+    sudo service tftpd-hpa restart
 
 }
 
@@ -84,6 +87,8 @@ default tinycore
 
 configNFS() {
 	echo "/tftpboot/tinycore/nfs/ *(rw,no_root_squash)" > /etc/exports
+
+    service nfs-kernel-server restart
 }
 
 configTinyCore() {
