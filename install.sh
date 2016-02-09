@@ -1,5 +1,9 @@
 #! /bin/bash
 
+
+#http://www.routingloops.co.uk/linux/tftp-on-ubuntu-14-04-lts-server/
+
+
 hostname="pxeServer"
 
 hostsln1="127.0.0.1		localhost"
@@ -151,3 +155,4 @@ configSyslinux
 configNFS
 configTinyCore
 
+reboot

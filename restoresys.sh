@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/bash 
 
 drive=/dev/sda
 imagePart=$drive\9
@@ -18,13 +18,17 @@ Select an option and this system will reboot after completion :
 	2) Multicast Receive (WILL ERASE ALL DATA!)
 	r) Reboot
 		"""
-		read -p "Enter an option: " opt
+	read -p "Enter an option: " opt
 
 
 		case "$opt" in
 
 		c)	
 			echo "Creating System Image..."
+				echo "1)"
+				read -p "Enter a drive name (/dev/sda): " drive
+				echo drive
+			;;
 
 		1)
 			echo "Restoring full drive...."
@@ -34,26 +38,10 @@ Select an option and this system will reboot after completion :
 			
 			;;
 		2)
-			echo "Restoring windows and linux from local drive...."
-			restoreParts
+			echo "Starting Multicast Receive...."
+			#restoreParts
 			#changeHostname
 			;;
-		3)
-			echo "Restoring Windows...."
-			resWin
-			#changeHostname
-			;;
-		4)
-			echo "Restoring Linux...."
-			resLinux
-			#changeHostname
-			;;
-		5)
-		    echo "Restoring windows and linux from Network..."
-		    partDrive
-			netRestore
-			#changeHostname
-		    ;;
 		r)
 			echo "Rebooting..."
 			reboot
@@ -66,6 +54,79 @@ Select an option and this system will reboot after completion :
 #########################################################
 #	Functions
 #########################################################
+
+#########################################################
+#	Create Image Functions
+#########################################################
+
+partTable() {
+	# export the partition table to file 
+	echo "exporting $drive Partition table...."
+	sfdisk -d $drive > partitiontable
+	}
+
+#########################################################
+
+zeroParts() {
+	echo "Zeroing free space on partitions..."
+
+#fdisk -l /dev/sdc | grep -o '/dev/sdc*[1-9]'
+# Get the list of partitions to be zeroed and add them to an array
+# $parts is the array of the partition names (eg. /dev/sda1, etc..)
+# maximum partitions 9 change 9 to allow for more
+	parts=($(fdisk -l $drive | grep -o "$drive*[1-9]"))
+	echo Partitions found: ${parts[*]}
+	
+# For each partition in the list
+	for p in "${parts[@]}"
+	do
+		echo $p
+		
+	# make a temp directory
+		mkdir /mnt/temp
+
+	# mount the current partition
+
+		mount -t ntfs-3g $p /mnt/temp || mount $p /mnt/temp
+
+	# Zero the empty space
+		echo "Creating Zeros"
+		dd if=/dev/zero | pv | dd of=/mnt/temp/delete bs=1M
+
+	# Delete the file to restore the free space
+		rm /mnt/temp/delete
+
+	# Unmount the current partition
+		umount $p
+		
+	#delete the temp directory
+		rmdir /mnt/temp
+
+	done
+	}
+
+#########################################################
+
+imgParts() {
+	parts=($(fdisk -l $drive | grep -o "$drive*[1-9]"))
+	echo Partitions found: ${parts[*]}
+	
+# For each partition in the list
+	for p in "${parts[@]}"
+	do
+
+	# gets the name of the drive in the format 'sda1' so it can be saved as a file
+		pName=`echo $p | sed -e 's/\/dev\///g'`
+		
+	# using dd and gzip we take an image of the partition and compress it
+		echo "Creating compressed image of $p..." 
+		dd if=$p conv=sync,noerror bs=4k | pv | gzip -c > $pName.img.gz
+		
+	done
+	}
+
+##########################################################
+
 
 #### Partition Drive ####################################
 

@@ -4,8 +4,10 @@
 #
 # Dependencies: fdisk, sfdisk, pv, grep, dd, sed
 
+## WARNING: Maximum Number of Partitions is 9
+
 #########################################################
-#	Functions
+#	Create Image Functions
 #########################################################
 
 partTable() {
