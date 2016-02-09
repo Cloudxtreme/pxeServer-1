@@ -28,13 +28,14 @@ Select an option and this system will reboot after completion :
 				drive=${drive:-/dev/sda}
 				read -p "Enter a image name (testImg): " name
 				name=${name:-testImg}
-				echo $name
+				echo "image Name: " $name
+				echo "Drive Name: " $drive
 				
 				pause
 
 				# make the directory for the imaging files
-				mkdir Images
-				cd Images
+				mkdir images
+				cd images
 				mkdir $name
 				chmod 777 $name
 				cd $name

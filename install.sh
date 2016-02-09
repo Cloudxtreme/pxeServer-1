@@ -20,7 +20,7 @@ init() {
 
 	apt-get update -y
 
-	apt-get install -y isc-dhcp-server tftpd-hpa syslinux nfs-kernel-server
+	apt-get install -y isc-dhcp-server tftpd-hpa syslinux nfs-kernel-server tree
 
 	echo "auto lo eth0 eth1
 iface lo inet loopback
