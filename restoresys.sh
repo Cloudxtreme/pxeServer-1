@@ -32,8 +32,8 @@ Select an option and this system will reboot after completion :
 
 		1)
 			echo "Restoring full drive...."
-			partDrive
-			copyImgs
+			#partDrive
+			#copyImgs
 			#changeHostname
 			
 			;;
@@ -47,7 +47,7 @@ Select an option and this system will reboot after completion :
 			reboot
 			;;
 		esac
-		reboot
+		#reboot
 	done
 }
 
