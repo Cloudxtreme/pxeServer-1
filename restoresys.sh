@@ -29,6 +29,8 @@ Select an option and this system will reboot after completion :
 				read -p "Enter a drive name (/dev/sda): " drive
 				drive=${drive:-/dev/sda}
 				echo $drive
+				pause
+
 			;;
 
 		1)
@@ -358,6 +360,10 @@ imgParts() {
 		
 	done
 	}	
+
+pause() {
+	read -p "Press [Enter] key to start backup..."
+}
 
 
 main
