@@ -1,7 +1,6 @@
 #! /bin/bash 
 
-drive=/dev/sda
-imagePart=$drive\9
+#imagePart=$drive\9
 
 
 main() {
@@ -25,11 +24,25 @@ Select an option and this system will reboot after completion :
 
 		c)	
 			echo "Creating System Image..."
-				echo "1)"
 				read -p "Enter a drive name (/dev/sda): " drive
 				drive=${drive:-/dev/sda}
-				echo $drive
+				read -p "Enter a image name (testImg): " name
+				name=${name:-testImg}
+				echo $name
+				
 				pause
+
+				# make the directory for the imaging files
+				mkdir Images
+				cd Images
+				mkdir $name
+				chmod 777 $name
+				cd $name
+				echo Directory Created: $name
+				
+				#partTable
+				#zeroParts
+				#imgParts
 
 			;;
 
@@ -362,7 +375,7 @@ imgParts() {
 	}	
 
 pause() {
-	read -p "Press [Enter] key to start backup..."
+	read -p "Press [Enter] key to continue..."
 }
 
 
