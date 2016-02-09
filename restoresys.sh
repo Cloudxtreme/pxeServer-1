@@ -27,7 +27,8 @@ Select an option and this system will reboot after completion :
 			echo "Creating System Image..."
 				echo "1)"
 				read -p "Enter a drive name (/dev/sda): " drive
-				echo drive
+				drive=${drive:-/dev/sda}
+				echo $drive
 			;;
 
 		1)
