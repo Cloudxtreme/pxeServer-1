@@ -129,6 +129,10 @@ configTinyCore() {
     wget http://distro.ibiblio.org/tinycorelinux/4.x/x86/tcz/bash.tcz
     wget http://distro.ibiblio.org/tinycorelinux/4.x/x86/tcz/ncurses.tcz
     wget http://distro.ibiblio.org/tinycorelinux/4.x/x86/tcz/ncursesw.tcz
+    wget http://distro.ibiblio.org/tinycorelinux/4.x/x86/tcz/ntfs-3g.tcz
+
+    wget http://distro.ibiblio.org/tinycorelinux/4.x/x86/tcz/urxvt.tcz
+
 
     cd /tftpboot/tinycore/nfs/tce/
 
@@ -144,15 +148,16 @@ configTinyCore() {
     echo 'bash.tcz' >> onboot.lst
     echo 'ncurses.tcz' >> onboot.lst
     echo 'ncursesw.tcz' >> onboot.lst
-
+    echo 'ntfs-3g.tcz' >> onboot.lst
+    echo 'urxvt.tcz' >> onboot.lst
 
 }
 
-init
-configDhcp
-configTftp
-configSyslinux
-configNFS
+#init
+#configDhcp
+#configTftp
+#configSyslinux
+#configNFS
 configTinyCore
 
-reboot
+#reboot
