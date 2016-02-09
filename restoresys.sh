@@ -41,9 +41,9 @@ Select an option and this system will reboot after completion :
 				cd $name
 				echo Directory Created: $name
 				
-				#partTable
-				#zeroParts
-				#imgParts
+				partTable
+				zeroParts
+				imgParts
 
 			;;
 
