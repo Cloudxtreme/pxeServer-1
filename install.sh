@@ -1,6 +1,7 @@
 #! /bin/bash
-
-
+#
+# DESIGNED for use with ubuntu 14.04
+#
 #http://www.routingloops.co.uk/linux/tftp-on-ubuntu-14-04-lts-server/
 
 
