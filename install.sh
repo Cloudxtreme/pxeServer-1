@@ -168,13 +168,14 @@ configCoreOS() {
 
 }
 
+
+
+init
+configDhcp
+configTftp
+configSyslinux
+configNFS
+configTinyCore
 configCoreOS
 
-#init
-#configDhcp
-#configTftp
-#configSyslinux
-#configNFS
-configTinyCore
-
-#reboot
+reboot
