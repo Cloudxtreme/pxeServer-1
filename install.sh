@@ -73,20 +73,18 @@ configSyslinux() {
 
     echo "
 default tinycore
+    prompt 1
+    timeout 15
+    
     label tinycore
+    menu default
     	kernel tinycore/vmlinuz
-    	append initrd=tinycore/core.gz nfsmount=192.168.0.1:/tftpboot/tinycore/nfs/ tftplist=192.168.0.1:/nfs/tce/onboot.lst tce=nfs/tce" > /tftpboot/pxelinux.cfg/default
+    	append initrd=tinycore/core.gz nfsmount=192.168.0.1:/tftpboot/tinycore/nfs/ tftplist=192.168.0.1:/nfs/tce/onboot.lst tce=nfs/tce
+    
+    label coreos
+      kernel coreOS/coreos_production_pxe.vmlinuz
+      append initrd=coreOS/coreos_production_pxe_image.cpio.gz" > /tftpboot/pxelinux.cfg/default
 
-    mkdir /temp/
-    cd /temp/
-    wget $tinycoreUrl
-    mkdir /mnt/tinycore
-    mount -o loop TinyCore-6.4.iso /mnt/tinycore
-
-    cd /mnt/tinycore/boot/
-
-    cp core.gz /tftpboot/tinycore/
-    cp vmlinuz /tftpboot/tinycore/
 
 }
 
@@ -153,6 +151,24 @@ configTinyCore() {
     echo 'urxvt.tcz' >> onboot.lst
 
 }
+
+configCoreOS() {
+
+    cd /tftpboot
+    mkdir coreOS
+
+
+    wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz
+    wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz.sig
+    wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz
+    wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz.sig
+    gpg --verify coreos_production_pxe.vmlinuz.sig
+    gpg --verify coreos_production_pxe_image.cpio.gz.sig
+      
+
+}
+
+configCoreOS
 
 #init
 #configDhcp
