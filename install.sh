@@ -69,6 +69,8 @@ configSyslinux() {
     mkdir /tftpboot/tinycore/
     mkdir /tftpboot/tinycore/nfs/
 
+    mkdir /tftpboot/disklessboot/
+
     touch default
 
     echo "
@@ -79,15 +81,16 @@ default tinycore
     	kernel tinycore/vmlinuz
     	append initrd=tinycore/core.gz nfsmount=192.168.0.1:/tftpboot/tinycore/nfs/ tftplist=192.168.0.1:/nfs/tce/onboot.lst tce=nfs/tce
     
-    label coreos
-      kernel coreOS/coreos_production_pxe.vmlinuz
-      append initrd=coreOS/coreos_production_pxe_image.cpio.gz" > /tftpboot/pxelinux.cfg/default
+    label My Diskless Boot PC
+        kernel disklessboot/vmlinuz
+        append initrd=disklessboot/initrd.img root=/dev/nfs nfsroot=192.168.0.1:/tftpboot/disklessboot/nfs ip=dhcp rw" > /tftpboot/pxelinux.cfg/default
 
 
 }
 
 configNFS() {
 	echo "/tftpboot/tinycore/nfs/ *(rw,no_root_squash)" > /etc/exports
+    echo "/tftpboot/disklessboot/nfs/ *(rw,no_root_squash)" >> /etc/exports
 
     service nfs-kernel-server restart
 }
@@ -150,19 +153,9 @@ configTinyCore() {
 
 }
 
-configCoreOS() {
+configDisklessBoot() {
 
-    cd /tftpboot/
-    mkdir coreOS
-    cd coreOS
-
-
-    wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz
-    wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz.sig
-    wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz
-    wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz.sig
-    gpg --verify coreos_production_pxe.vmlinuz.sig
-    gpg --verify coreos_production_pxe_image.cpio.gz.sig
+    cd /tftpboot/disklessboot
       
 
 }
@@ -175,6 +168,6 @@ configTftp
 configSyslinux
 configNFS
 configTinyCore
-configCoreOS
+configDisklessBoot
 
 reboot
