@@ -73,8 +73,6 @@ configSyslinux() {
 
     echo "
 default tinycore
-    prompt 1
-    timeout 15
     
     label tinycore
     menu default
@@ -154,8 +152,9 @@ configTinyCore() {
 
 configCoreOS() {
 
-    cd /tftpboot
+    cd /tftpboot/
     mkdir coreOS
+    cd coreOS
 
 
     wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz
