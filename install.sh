@@ -2,6 +2,8 @@
 #
 # DESIGNED for use with ubuntu 14.04
 #
+# INSTALL Script for PXE Experimental Server
+#
 #http://www.routingloops.co.uk/linux/tftp-on-ubuntu-14-04-lts-server/
 
 
@@ -21,7 +23,7 @@ init() {
 
 	apt-get update -y
 
-	apt-get install -y isc-dhcp-server tftpd-hpa syslinux nfs-kernel-server tree
+	apt-get install -y isc-dhcp-server tftpd-hpa syslinux nfs-kernel-server initramfs-tools tree
 
 	echo "auto lo eth0 eth1
 iface lo inet loopback
@@ -70,6 +72,7 @@ configSyslinux() {
     mkdir /tftpboot/tinycore/nfs/
 
     mkdir /tftpboot/disklessboot/
+    mkdir /tftpboot/disklessboot/nfs/
 
     touch default
 
