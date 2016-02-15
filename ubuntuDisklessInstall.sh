@@ -6,6 +6,11 @@
 #
 
 
+hostname="pxeServer"
+
+hostsln1="127.0.0.1		localhost"
+hostsln2="127.0.1.1		pxeServer      pxeServer.phil.dev"
+
 init() {
 	echo $hostname > /etc/hostname
 	echo $hostsln1 > /etc/hosts
@@ -78,10 +83,10 @@ configNFS() {
 }
 
 init
-configDhcp
-configTftp
-configSyslinux
-configNFS
+#configDhcp
+#configTftp
+#configSyslinux
+#configNFS
 
 reboot
 
