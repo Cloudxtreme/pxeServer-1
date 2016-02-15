@@ -77,4 +77,11 @@ configNFS() {
     service nfs-kernel-server restart
 }
 
+init
+configDhcp
+configTftp
+configSyslinux
+configNFS
+
+reboot
 
