@@ -69,8 +69,8 @@ configSyslinux() {
     touch default
 
     echo "LABEL linux
-KERNEL vmlinuz
-APPEND root=/dev/nfs initrd=initrd.img nfsroot=192.168.0.1:/tftpboot/ubuntu/nfs/ ip=dhcp rw" > /tftpboot/pxelinux.cfg/default
+KERNEL ubuntu/vmlinuz
+APPEND root=/dev/nfs initrd=ubuntu/initrd.img nfsroot=192.168.0.1:/tftpboot/ubuntu/nfs/ ip=dhcp rw" > /tftpboot/pxelinux.cfg/default
 
 
 }
